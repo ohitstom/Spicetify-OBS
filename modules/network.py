@@ -29,13 +29,11 @@ class startServer():
             line = str(await proc.stdout.readline(), encoding="utf-8")
             if line.strip() != "":
                 output = line.strip()
-        
         with open(output, 'r') as f:
             for line in f:
-                if 'WebSocket' in line:
+                if 'new WebSocket' in line:
                     string = line.strip()
-                    index = string.rindex('/')
-                    port = string[index-4:index]
+                    port = ''.join(filter(str.isdigit, string))
                     print(f"port: {port} found!")
                     return port
 
@@ -52,13 +50,14 @@ class startServer():
                 f.write(str(value))
             
     async def handler(self, websocket, path):
-        print("Spotify is connected")
-        try:
-            async for message in websocket:
-                self.jsonExporter(message)
-        except websockets.exceptions.ConnectionClosedError:
-            print("Spotify disconnected, attempting to reconnect.")
-            return
+        if await websocket.recv():
+            print("Spotify is connected")
+            try:
+                async for message in websocket:
+                    self.jsonExporter(message)
+            except websockets.exceptions.ConnectionClosedError:
+                print("Spotify disconnected, attempting to reconnect.")
+                return
             
     async def initialize(self):
         print("Server Ready, waiting for client.")
