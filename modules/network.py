@@ -8,7 +8,7 @@ import os
 class startServer():
     def __init__(self):
         print("Thread Started")
-        self.port = asyncio.run(self.portFinder())
+        self.port = 6534
         asyncio.run(self.initialize())  
   
     def process_pid_running(self, pid):
